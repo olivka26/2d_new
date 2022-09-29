@@ -54,6 +54,7 @@ protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseMoveEvent(QMouseEvent *event);
     void keyPressEvent(QKeyEvent *e);
+    void setProjection();
 public slots:
     // slots for xyz-rotation slider
     void setXRotation(int angle);
@@ -65,7 +66,7 @@ signals:
     void yRotationChanged(int angle);
     void zRotationChanged(int angle);
 private:
-    void drawPyramid();
+    //void drawPyramid();
     int xRot;
     int yRot;
     int zRot;

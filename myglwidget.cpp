@@ -1,5 +1,6 @@
 #include <QtWidgets>
 #include <QtOpenGL>
+#include <GL/glu.h>
 #include "myglwidget.h"
 #include "help.hpp"
 #include "chebyshev.hpp"
@@ -302,17 +303,16 @@ void MyGLWidget::press67(){
 void MyGLWidget::printwindow(){
     //TODO:
     // switch to:   renderText(x,y,"....")
-    QPainter painter(this);
-    painter.setPen("black");
-    painter.drawText(0, 20, f_name);
-    painter.drawText(10, 30, QString("format: %1").arg(view_id));
-    painter.drawText(10, 45, QString("scale: %1 [%2;%3]x[%4;%5]").arg(s).arg(a).arg(b).arg(c).arg(d));
-    painter.drawText(10, 60, QString("points: %1,%2").arg(nx).arg(ny));
-    painter.drawText(10, 75, QString("p: %1").arg(p));
+    qglColor(Qt::black);
+    renderText(0, 15, f_name);
+    renderText(10, 30, QString("format: %1").arg(view_id));
+    renderText(10, 45, QString("scale: %1 [%2;%3]x[%4;%5]").arg(s).arg(a).arg(b).arg(c).arg(d));
+    renderText(10, 60, QString("points: %1,%2").arg(nx).arg(ny));
+    renderText(10, 75, QString("p: %1").arg(p));
     if(k==0 && p==0 && view_id!=3)
-        painter.drawText(10, 90, QString("absmax(fact): %1( %2)").arg(absmax).arg(absmax));
+        renderText(10, 90, QString("absmax(fact): %1( %2)").arg(absmax).arg(absmax));
     else
-        painter.drawText(10, 90, QString("absmax(fact): %1( %2)").arg(absmax).arg(max(fabs(extr[0]), fabs(extr[1]))));
+        renderText(10, 90, QString("absmax(fact): %1( %2)").arg(absmax).arg(max(fabs(extr[0]), fabs(extr[1]))));
 }
 
 QSize MyGLWidget::minimumSizeHint() const{
@@ -370,6 +370,55 @@ void MyGLWidget::initializeGL(){
     glEnable(GL_LIGHT0);
 }
 
+void MyGLWidget::setProjection() {
+    // вычислим сдвиг и масштаб так, чтобы куб, содержащий график
+    // вписывался в окно [-1, 1]x[-1, 1]
+    double modelM[16],projM[16];
+    int view[4]={-1,-1,2,2};
+    double verts[8][3];
+    glMatrixMode(GL_PROJECTION);
+    glLoadIdentity();
+    glGetDoublev(GL_MODELVIEW_MATRIX,modelM);
+    glGetDoublev(GL_PROJECTION_MATRIX,projM);
+    //glGetIntegerv(GL_VIEWPORT,view);
+    // ищем проекции вершин куба [a,b]x[c,d]x[minz,maxz] на плоскость экрана
+    gluProject(a,c,extr[0],modelM,projM,view,
+            &verts[0][0],&verts[0][1],&verts[0][2]);
+    gluProject(b,c,extr[0],modelM,projM,view,
+            &verts[1][0],&verts[1][1],&verts[1][2]);
+    gluProject(a,d,extr[0],modelM,projM,view,
+            &verts[2][0],&verts[2][1],&verts[2][2]);
+    gluProject(b,d,extr[0],modelM,projM,view,
+            &verts[3][0],&verts[3][1],&verts[3][2]);
+    gluProject(a,c,extr[1],modelM,projM,view,
+            &verts[4][0],&verts[4][1],&verts[4][2]);
+    gluProject(b,c,extr[1],modelM,projM,view,
+            &verts[5][0],&verts[5][1],&verts[5][2]);
+    gluProject(a,d,extr[1],modelM,projM,view,
+            &verts[6][0],&verts[6][1],&verts[6][2]);
+    gluProject(b,d,extr[1],modelM,projM,view,
+            &verts[7][0],&verts[7][1],&verts[7][2]);
+    // ищем квадрат в плоскости экрана куда они вписываются
+    double minX=verts[0][0], maxX=verts[0][0],
+            minY=verts[0][1], maxY=verts[0][1],
+            minZ=verts[0][2], maxZ=verts[0][2];
+    for (int i=1; i<8; i++) {
+        if (verts[i][0]<minX) minX=verts[i][0];
+        if (verts[i][1]<minY) minY=verts[i][1];
+        if (verts[i][2]<minZ) minZ=verts[i][2];
+        if (verts[i][0]>maxX) maxX=verts[i][0];
+        if (verts[i][1]>maxY) maxY=verts[i][1];
+        if (verts[i][2]>maxZ) maxZ=verts[i][2];
+    }
+    double sz=maxX-minX;
+    if (maxY-minY>sz) sz=maxY-minY;
+    sz*=1.1;
+    // "центр масс"
+    double cx=(maxX+minX)/2,cy=(maxY+minY)/2;
+    glOrtho(cx-sz/2, cx+sz/2, cy-sz/2, cy+sz/2, -20, +20);
+    glMatrixMode(GL_MODELVIEW);
+}
+
 void MyGLWidget::paintGL(){
     printwindow();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -380,6 +429,7 @@ void MyGLWidget::paintGL(){
     glRotatef(zRot , 0.0, 0.0, 1.0);
     glRotatef(xRot , 1.0, 0.0, 0.0);
     glRotatef(yRot , 0.0, 1.0, 0.0);
+    setProjection();
     glLineWidth(2.0);
     glBegin(GL_LINES);
     glColor3d(0,1.0,0);
@@ -398,16 +448,17 @@ void MyGLWidget::paintGL(){
         appr_graph();
     if(view_id==2)
         err_graph();
+    printwindow();
 }
 
 void MyGLWidget::resizeGL(int width, int height){
     glViewport(0, 0, width, height);
-    double aspect=height*1.0/width;
+    /*double aspect=height*1.0/width;
     glMatrixMode(GL_PROJECTION);
     glLoadIdentity();
     // TODO: if aspect>1 ....
     glOrtho(-1, +1, -1*aspect, +1*aspect, 1.0, 15.0);
-    glMatrixMode(GL_MODELVIEW);
+    glMatrixMode(GL_MODELVIEW);*/
 }
 
 void MyGLWidget::mousePressEvent(QMouseEvent *event){
