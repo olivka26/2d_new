@@ -35,16 +35,6 @@ void chebyshevpoints(double *cx, double *cy, int nx, int ny, double a, double b,
             angley+=stepy;
         }
     }
-    /*printf("cx values:\n");
-    for(int i=0; i<=nx+1; ++i){
-        printf("%lf ", cx[i]);
-    }
-    printf("\n");
-    printf("cy values:\n");
-    for(int j=0; j<=ny+1; ++j){
-        printf("%lf ", cy[j]);
-    }
-    printf("\n");*/
 }
 
 void Fill_F(double *F, int nx, int ny, double *cx, double *cy, double (*f)(double, double)){
@@ -53,13 +43,6 @@ void Fill_F(double *F, int nx, int ny, double *cx, double *cy, double (*f)(doubl
             F[i*(ny+2)+j]=f(cx[i], cy[j]);
         }
     }
-    /*printf("F matrix:\n");
-    for(int i=0;i<=nx+1;++i){
-        for(int j=0;j<=ny+1;++j){
-            printf("%lf ",F[i*(ny+2)+j]);
-        }
-        printf("\n");
-    }*/
 }
 
 double chebyshevtrans(double a, double b, double x){
@@ -77,13 +60,6 @@ void fill_Fx(double *Fx, double *cx, int nx, double a, double b){
             Fx[i*nx+j]=trans*Fx[(i-1)*nx+j]-Fx[(i-2)*nx+j];
         }
     }
-    /*printf("Fx matrix:\n");
-    for(int i=0; i<nx; ++i){
-        for(int j=0; j<nx; ++j){
-            printf("%lf ",Fx[i*nx+j]);
-        }
-        printf("\n");
-    }*/
 }
 
 void fill_Fy(double *Fy, double *cy, int ny, double c, double d){
@@ -97,13 +73,6 @@ void fill_Fy(double *Fy, double *cy, int ny, double c, double d){
             Fy[i*ny+j]=trans*Fy[i*ny+j-1]-Fy[i*ny+j-2];
         }
     }
-    /*printf("Fy matrix:\n");
-    for(int i=0; i<ny; ++i){
-        for(int j=0; j<ny; ++j){
-            printf("%lf ",Fy[i*ny+j]);
-        }
-        printf("\n");
-    }*/
 }
 
 double fscalar_ij(int i, int nx, double *Fx, double *F, double *Fy, int ny, int j){
@@ -221,13 +190,6 @@ void interpolation_tensor(double *T, double *Fx, double *F, double *Fy, int nx, 
             T[i*ny+j]=fscalar_ij(i, nx, Fx, F, Fy, ny, j);
         }
     }
-    /*printf("T matrix:\n");
-    for(int i=0;i<nx;++i){
-        for(int j=0;j<ny;++j){
-            printf("%lf ",T[i*ny+j]);
-        }
-        printf("\n");
-    }*/
 }
 
 void Fill_TT(double *Fx, int nx, double *T, double *Fy, int ny, double *TT){
@@ -248,11 +210,4 @@ void Fill_TT(double *Fx, int nx, double *T, double *Fy, int ny, double *TT){
     TT[ny+1]=scalar_ad(nx, T, ny);
     TT[(nx+1)*(ny+2)]=scalar_bc(nx, T, ny);
     TT[(nx+2)*(ny+2)-1]=scalar_bd(nx, T, ny);
-    /*printf("TT matrix:\n");
-    for(int i=0;i<=nx+1;++i){
-        for(int j=0;j<=ny+1;++j){
-            printf("%lf ",TT[i*(ny+2)+j]);
-        }
-        printf("\n");
-    }*/
 }

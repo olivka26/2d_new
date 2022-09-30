@@ -84,7 +84,7 @@ void MyGLWidget::allocate(){
     cx=(double*)malloc((nx+2)*sizeof(double));
     cy=(double*)malloc((ny+2)*sizeof(double));
     Fx=(double*)malloc(nx*nx*sizeof(double));
-    Fy=(double*)malloc(nx*ny*sizeof(double));
+    Fy=(double*)malloc(ny*ny*sizeof(double));
     T=(double*)malloc(nx*ny*sizeof(double));
     TT=(double*)malloc((nx+2)*(ny+2)*sizeof(double));
 }
@@ -176,7 +176,7 @@ void MyGLWidget::draw_area(){
     glColor3f(0.0,0.0,0.0);
     for(int i=0; i<=nx+1; ++i){
         glBegin(GL_LINE_STRIP);
-        for(int j=0; j<=nx+1; ++j)
+        for(int j=0; j<=ny+1; ++j)
             glVertex3f(cx[i],cy[j],0);
         glEnd();
     }
@@ -192,7 +192,7 @@ void MyGLWidget::func_graph(){
     glColor3f(1.0,0.0,0.0);
     for(int i=0; i<=nx+1; ++i){
         glBegin(GL_LINE_STRIP);
-        for(int j=0; j<=nx+1; ++j)
+        for(int j=0; j<=ny+1; ++j)
             glVertex3f(cx[i],cy[j],F[i*(ny+2)+j]);
         glEnd();
     }
@@ -208,7 +208,7 @@ void MyGLWidget::appr_graph(){
     glColor3f(0.0,1.0,0.0);
     for(int i=0; i<=nx+1; ++i){
         glBegin(GL_LINE_STRIP);
-        for(int j=0; j<=nx+1; ++j)
+        for(int j=0; j<=ny+1; ++j)
             glVertex3f(cx[i],cy[j],TT[i*(ny+2)+j]);
         glEnd();
     }
@@ -224,7 +224,7 @@ void MyGLWidget::err_graph(){
     glColor3f(0.0,0.0,1.0);
     for(int i=0; i<=nx+1; ++i){
         glBegin(GL_LINE_STRIP);
-        for(int j=0; j<=nx+1; ++j)
+        for(int j=0; j<=ny+1; ++j)
             glVertex3f(cx[i],cy[j],F[i*(ny+2)+j]-TT[i*(ny+2)+j]);
         glEnd();
     }

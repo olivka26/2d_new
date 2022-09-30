@@ -1,14 +1,20 @@
 #include "help.hpp"
 
 double f0(double x, double y){
+    if(x>0 && y>0)
+        return 1;
     return 1;
 }
 
 double f1(double x, double y){
+    if(x>0 && y>0)
+        return x;
     return x;
 }
 
 double f2(double x, double y){
+    if(x>0 && y>0)
+        return y;
     return y;
 }
 
