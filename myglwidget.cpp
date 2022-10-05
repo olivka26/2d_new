@@ -145,7 +145,7 @@ void MyGLWidget::change_func(){
             max_z=F[(ny+2)*(nx/2+1)+ny/2+1];
         if(F[(ny+2)*(nx/2+1)+ny/2+1]<min_z)
             min_z=F[(ny+2)*(nx/2+1)+ny/2+1];
-        absmax=max(fabs(min_z), fabs(max_z));
+        //absmax=max(fabs(min_z), fabs(max_z));
     }
 }
 
@@ -258,7 +258,7 @@ void MyGLWidget::press23(){
             max_z=F[(ny+2)*(nx/2+1)+ny/2+1];
         if(F[(ny+2)*(nx/2+1)+ny/2+1]<min_z)
             min_z=F[(ny+2)*(nx/2+1)+ny/2+1];
-        absmax=max(fabs(min_z), fabs(max_z));
+        //absmax=max(fabs(min_z), fabs(max_z));
     }
     interpolation_tensor(T, Fx, F, Fy, nx, ny);
     Fill_TT(Fx, nx, T,Fy,ny, TT);
@@ -278,7 +278,7 @@ void MyGLWidget::press45(){
             max_z=F[(ny+2)*(nx/2+1)+ny/2+1];
         if(F[(ny+2)*(nx/2+1)+ny/2+1]<min_z)
             min_z=F[(ny+2)*(nx/2+1)+ny/2+1];
-        absmax=max(fabs(min_z), fabs(max_z));
+        //absmax=max(fabs(min_z), fabs(max_z));
     }
     interpolation_tensor(T, Fx, F, Fy, nx, ny);
     Fill_TT(Fx, nx, T,Fy,ny, TT);
@@ -287,13 +287,11 @@ void MyGLWidget::press45(){
 }
 
 void MyGLWidget::press67(){
-    if(p)
-        F[(ny+2)*(nx/2+1)+ny/2+1]=f(nx/2+1,ny/2+1)+(0.1*absmax*p);
     if(F[(ny+2)*(nx/2+1)+ny/2+1]>max_z)
         max_z=F[(ny+2)*(nx/2+1)+ny/2+1];
     if(F[(ny+2)*(nx/2+1)+ny/2+1]<min_z)
         min_z=F[(ny+2)*(nx/2+1)+ny/2+1];
-    absmax=max(fabs(min_z), fabs(max_z));
+    //absmax=max(fabs(min_z), fabs(max_z));
     interpolation_tensor(T, Fx, F, Fy, nx, ny);
     Fill_TT(Fx, nx, T,Fy,ny, TT);
     extrema_hunt();
@@ -441,7 +439,7 @@ void MyGLWidget::paintGL(){
     glVertex3d(0,0,0);
     glVertex3d(0,0,2);
     glEnd();
-    //draw_area();
+    draw_area();
     if(view_id==0)
         func_graph();
     if(view_id==1)
@@ -518,10 +516,12 @@ void MyGLWidget::keyPressEvent(QKeyEvent* e){
             break;
         case Qt::Key_6:
             ++p;
+            F[(ny+2)*(nx/2+1)+ny/2+1]+=(0.1*absmax);
             press67();
             break;
         case Qt::Key_7:
             --p;
+            F[(ny+2)*(nx/2+1)+ny/2+1]-=(0.1*absmax);
             press67();
             break;
         case Qt::Key_8:
