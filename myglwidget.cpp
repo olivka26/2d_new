@@ -62,6 +62,7 @@ int MyGLWidget::parse_command_line(){
     Fill_TT(Fx, nx, T,Fy,ny, TT);
     extrema_hunt();
     print_console();
+    printf("first iteration\n");
     return 0;
 }
 
@@ -95,9 +96,10 @@ void MyGLWidget::print_console(){
     printf("squeeze-stretch: %d\n", s);
     printf("points: %d %d\n", nx,ny);
     printf("disturbance: %d\n", p);
-    printf("function absmax: %lf\n", absmax);
-    printf("factic absmax: %lf\n", max(fabs(extr[0]),fabs(extr[1])));
-    printf("extrema: %lf;%lf\n\n", extr[0], extr[1]);
+    printf("function absmax: %10.3e\n", absmax);
+    printf("factic absmax: %10.3e\n", max(fabs(extr[0]),fabs(extr[1])));
+    printf("extrema: %10.3e;%10.3e\n", extr[0], extr[1]);
+    printf("angle around Oz: %d\n\n", zRot);
 }
 
 void MyGLWidget::change_func(){
@@ -145,7 +147,6 @@ void MyGLWidget::change_func(){
             max_z=F[(ny+2)*(nx/2+1)+ny/2+1];
         if(F[(ny+2)*(nx/2+1)+ny/2+1]<min_z)
             min_z=F[(ny+2)*(nx/2+1)+ny/2+1];
-        //absmax=max(fabs(min_z), fabs(max_z));
     }
 }
 
@@ -155,8 +156,8 @@ void MyGLWidget::extrema_hunt(){
         extr[0]=min_z;
     }
     if(view_id==1){
-        extr[1]=max_matr(F,nx,ny);
-        extr[0]=min_matr(F,nx,ny);
+        extr[1]=max_matr(TT,nx,ny);
+        extr[0]=min_matr(TT,nx,ny);
     }
     if(view_id==2){
         extr[0]=F[0]-TT[0];
@@ -189,7 +190,7 @@ void MyGLWidget::draw_area(){
 }
 
 void MyGLWidget::func_graph(){
-    glColor3f(1.0,0.0,0.0);
+    glColor3f(1.0,1.0,0.0);
     for(int i=0; i<=nx+1; ++i){
         glBegin(GL_LINE_STRIP);
         for(int j=0; j<=ny+1; ++j)
@@ -205,7 +206,7 @@ void MyGLWidget::func_graph(){
 }
 
 void MyGLWidget::appr_graph(){
-    glColor3f(0.0,1.0,0.0);
+    glColor3f(1.0,0.0,1.0);
     for(int i=0; i<=nx+1; ++i){
         glBegin(GL_LINE_STRIP);
         for(int j=0; j<=ny+1; ++j)
@@ -221,7 +222,7 @@ void MyGLWidget::appr_graph(){
 }
 
 void MyGLWidget::err_graph(){
-    glColor3f(0.0,0.0,1.0);
+    glColor3f(0.0,1.0,1.0);
     for(int i=0; i<=nx+1; ++i){
         glBegin(GL_LINE_STRIP);
         for(int j=0; j<=ny+1; ++j)
@@ -240,8 +241,6 @@ void MyGLWidget::press0(){
     change_func();
     interpolation_tensor(T, Fx, F, Fy, nx, ny);
     Fill_TT(Fx, nx, T,Fy,ny, TT);
-    extrema_hunt();
-    print_console();
 }
 
 void MyGLWidget::press23(){
@@ -258,12 +257,9 @@ void MyGLWidget::press23(){
             max_z=F[(ny+2)*(nx/2+1)+ny/2+1];
         if(F[(ny+2)*(nx/2+1)+ny/2+1]<min_z)
             min_z=F[(ny+2)*(nx/2+1)+ny/2+1];
-        //absmax=max(fabs(min_z), fabs(max_z));
     }
     interpolation_tensor(T, Fx, F, Fy, nx, ny);
     Fill_TT(Fx, nx, T,Fy,ny, TT);
-    extrema_hunt();
-    print_console();
 }
 
 void MyGLWidget::press45(){
@@ -278,12 +274,9 @@ void MyGLWidget::press45(){
             max_z=F[(ny+2)*(nx/2+1)+ny/2+1];
         if(F[(ny+2)*(nx/2+1)+ny/2+1]<min_z)
             min_z=F[(ny+2)*(nx/2+1)+ny/2+1];
-        //absmax=max(fabs(min_z), fabs(max_z));
     }
     interpolation_tensor(T, Fx, F, Fy, nx, ny);
     Fill_TT(Fx, nx, T,Fy,ny, TT);
-    extrema_hunt();
-    print_console();
 }
 
 void MyGLWidget::press67(){
@@ -291,11 +284,8 @@ void MyGLWidget::press67(){
         max_z=F[(ny+2)*(nx/2+1)+ny/2+1];
     if(F[(ny+2)*(nx/2+1)+ny/2+1]<min_z)
         min_z=F[(ny+2)*(nx/2+1)+ny/2+1];
-    //absmax=max(fabs(min_z), fabs(max_z));
     interpolation_tensor(T, Fx, F, Fy, nx, ny);
     Fill_TT(Fx, nx, T,Fy,ny, TT);
-    extrema_hunt();
-    print_console();
 }
 
 void MyGLWidget::printwindow(){
@@ -307,10 +297,11 @@ void MyGLWidget::printwindow(){
     renderText(10, 45, QString("scale: %1 [%2;%3]x[%4;%5]").arg(s).arg(a).arg(b).arg(c).arg(d));
     renderText(10, 60, QString("points: %1,%2").arg(nx).arg(ny));
     renderText(10, 75, QString("p: %1").arg(p));
-    if(k==0 && p==0 && view_id!=3)
-        renderText(10, 90, QString("absmax(fact): %1( %2)").arg(absmax).arg(absmax));
-    else
-        renderText(10, 90, QString("absmax(fact): %1( %2)").arg(absmax).arg(max(fabs(extr[0]), fabs(extr[1]))));
+    //if(k==0 && p==0 && view_id==0)
+    //    renderText(10, 90, QString("absmax(fact): %1( %2)").arg(absmax).arg(absmax));
+    //else
+    renderText(10, 90, QString("absmax(fact): %1( %2)").arg(absmax).arg(max(fabs(extr[0]), fabs(extr[1]))));
+    renderText(10, 105, QString("zRot: %1").arg(zRot));
 }
 
 QSize MyGLWidget::minimumSizeHint() const{
@@ -380,7 +371,7 @@ void MyGLWidget::setProjection() {
     glGetDoublev(GL_PROJECTION_MATRIX,projM);
     //glGetIntegerv(GL_VIEWPORT,view);
     // ищем проекции вершин куба [a,b]x[c,d]x[minz,maxz] на плоскость экрана
-    gluProject(a,c,extr[0],modelM,projM,view,
+    /*gluProject(a,c,extr[0],modelM,projM,view,
             &verts[0][0],&verts[0][1],&verts[0][2]);
     gluProject(b,c,extr[0],modelM,projM,view,
             &verts[1][0],&verts[1][1],&verts[1][2]);
@@ -395,7 +386,42 @@ void MyGLWidget::setProjection() {
     gluProject(a,d,extr[1],modelM,projM,view,
             &verts[6][0],&verts[6][1],&verts[6][2]);
     gluProject(b,d,extr[1],modelM,projM,view,
+            &verts[7][0],&verts[7][1],&verts[7][2]);*/
+    if(view_id==2){
+        gluProject(a,c,extr[0],modelM,projM,view,
+            &verts[0][0],&verts[0][1],&verts[0][2]);
+        gluProject(b,c,extr[0],modelM,projM,view,
+            &verts[1][0],&verts[1][1],&verts[1][2]);
+        gluProject(a,d,extr[0],modelM,projM,view,
+            &verts[2][0],&verts[2][1],&verts[2][2]);
+        gluProject(b,d,extr[0],modelM,projM,view,
+            &verts[3][0],&verts[3][1],&verts[3][2]);
+        gluProject(a,c,extr[1],modelM,projM,view,
+            &verts[4][0],&verts[4][1],&verts[4][2]);
+        gluProject(b,c,extr[1],modelM,projM,view,
+            &verts[5][0],&verts[5][1],&verts[5][2]);
+        gluProject(a,d,extr[1],modelM,projM,view,
+            &verts[6][0],&verts[6][1],&verts[6][2]);
+        gluProject(b,d,extr[1],modelM,projM,view,
             &verts[7][0],&verts[7][1],&verts[7][2]);
+    }else{
+        gluProject(a,c,min(extr[0],0),modelM,projM,view,
+            &verts[0][0],&verts[0][1],&verts[0][2]);
+        gluProject(b,c,min(extr[0],0),modelM,projM,view,
+            &verts[1][0],&verts[1][1],&verts[1][2]);
+        gluProject(a,d,min(extr[0],0),modelM,projM,view,
+            &verts[2][0],&verts[2][1],&verts[2][2]);
+        gluProject(b,d,min(extr[0],0),modelM,projM,view,
+            &verts[3][0],&verts[3][1],&verts[3][2]);
+        gluProject(a,c,max(extr[1],0),modelM,projM,view,
+            &verts[4][0],&verts[4][1],&verts[4][2]);
+        gluProject(b,c,max(extr[1],0),modelM,projM,view,
+            &verts[5][0],&verts[5][1],&verts[5][2]);
+        gluProject(a,d,max(extr[1],0),modelM,projM,view,
+            &verts[6][0],&verts[6][1],&verts[6][2]);
+        gluProject(b,d,max(extr[1],0),modelM,projM,view,
+            &verts[7][0],&verts[7][1],&verts[7][2]);
+    }
     // ищем квадрат в плоскости экрана куда они вписываются
     double minX=verts[0][0], maxX=verts[0][0],
             minY=verts[0][1], maxY=verts[0][1],
@@ -412,8 +438,8 @@ void MyGLWidget::setProjection() {
     if (maxY-minY>sz) sz=maxY-minY;
     sz*=1.1;
     // "центр масс"
-    double cx=(maxX+minX)/2,cy=(maxY+minY)/2;
-    glOrtho(cx-sz/2, cx+sz/2, cy-sz/2, cy+sz/2, -20, +20);
+    double sx=(maxX+minX)/2,sy=(maxY+minY)/2;
+    glOrtho(sx-sz/2, sx+sz/2, sy-sz/2, sy+sz/2, -20, +20);
     glMatrixMode(GL_MODELVIEW);
 }
 
@@ -422,7 +448,6 @@ void MyGLWidget::paintGL(){
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glLoadIdentity();
     // TODO:   [a,b]x[c,d]   Scale + Translate --> [-1,1]x[-1,1]
-    //glScaled()
     glTranslatef(0.0, 0.0, -10.0);
     glRotatef(zRot , 0.0, 0.0, 1.0);
     glRotatef(xRot , 1.0, 0.0, 0.0);
@@ -430,16 +455,18 @@ void MyGLWidget::paintGL(){
     setProjection();
     glLineWidth(2.0);
     glBegin(GL_LINES);
-    glColor3d(0,1.0,0);
-    glVertex3d(0,0,0);
-    glVertex3d(2,0,0);
-    glVertex3d(0,0,0);
-    glVertex3d(0,2,0);
+    glColor3d(1.0,0.0,0);
+    glVertex3d(a,0,0);
+    glVertex3d(b,0,0);
+    glColor3d(0.0,1.0,0);
+    glVertex3d(0,c,0);
+    glVertex3d(0,d,0);
     glColor3d(0,0.0,1.0);
-    glVertex3d(0,0,0);
-    glVertex3d(0,0,2);
+    glVertex3d(0,0,min(0,extr[0]));
+    glVertex3d(0,0,max(0,extr[1]));
     glEnd();
-    draw_area();
+    if(view_id!=2)
+        draw_area();
     if(view_id==0)
         func_graph();
     if(view_id==1)
@@ -477,7 +504,6 @@ void MyGLWidget::mouseMoveEvent(QMouseEvent *event){
 }
 
 void MyGLWidget::keyPressEvent(QKeyEvent* e){
-//    qDebug()<<"key";
     switch (e->key()){
         case Qt::Key_0:
             k=(k+1)%8;
@@ -536,5 +562,7 @@ void MyGLWidget::keyPressEvent(QKeyEvent* e){
         close();
     }
     e->accept();
+    extrema_hunt();
+    print_console();
     updateGL();
 }

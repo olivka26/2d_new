@@ -15,3 +15,4 @@ double min_matr(double *M, int nx, int ny);
 double max4(double a, double b, double c, double d);
 double min4(double a, double b, double c, double d);
 double max(double a, double b);
+double min(double a, double b);
