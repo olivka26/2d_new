@@ -3,7 +3,7 @@
 #include <QGLWidget>
 
 class MyGLWidget : public QGLWidget{
-    Q_OBJECT;
+    Q_OBJECT
     int nx; // number of points by X
     int ny; //number of points by Y
     int k; //id of the approxiamted function

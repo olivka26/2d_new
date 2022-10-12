@@ -62,7 +62,6 @@ int MyGLWidget::parse_command_line(){
     Fill_TT(Fx, nx, T,Fy,ny, TT);
     extrema_hunt();
     print_console();
-    printf("first iteration\n");
     return 0;
 }
 
